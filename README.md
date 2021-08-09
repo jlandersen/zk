@@ -1,2 +1,4 @@
 # zk
-Cli for my zettelkasten setup 📚⌨️
+CLI for my zettelkasten setup 📚⌨️
+
+## Setup

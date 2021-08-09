@@ -1,0 +1,52 @@
+#!/usr/bin/python3
+
+import os
+import sqlite3
+import argparse
+path = os.getenv('ZETTLE_HOME')
+zk_path = os.getenv('ZK_PATH')
+
+if path is None:
+    path = "/Users/jeppe/Library/Mobile Documents/com~apple~CloudDocs/Files/Notes/zettles"
+
+if zk_path is None:
+    zk_path = "/Users/jeppe/zk/bin"
+
+conn = sqlite3.connect(os.path.join(zk_path, 'index.db'))
+conn.execute("create virtual table if not exists notes using fts5(file, content, tags, mtime UNINDEXED, prefix = 3, tokenize = 'porter unicode61');")
+conn.execute("insert into notes (notes, rank) values ('rank', 'bm25(4.0, 1.0, 6.0, 0.0)');")
+
+for filename in os.listdir(path):
+    with open(os.path.join(path, filename), 'r') as f:
+        file_stats = os.stat(os.path.join(path, filename))
+        existing = conn.execute("select * from notes where file = ?", [filename]).fetchone()
+
+        if existing is None:
+            content = f.read()
+            conn.execute("insert into notes (file, content, tags, mtime) values (?, ?, ?, ?);", [filename, content, '', file_stats.st_mtime])
+        elif file_stats.st_mtime > existing[3]:
+            content = f.read()
+            conn.execute("update notes set content = ?, mtime = ?, tags= ? where file = ?;", [content, file_stats.st_mtime, '', filename])
+conn.commit()
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-q', '--query', type=str)
+parser.add_argument('-f', '--file', type=str)
+args = parser.parse_args()
+
+query = args.query
+file = args.file
+
+if file and query:
+    res = conn.execute("select * from notes where file = ? and notes match ? order by rank;", [file, query]).fetchall()
+elif file:
+    res = conn.execute("select * from notes where file = ? order by mtime;", [file, query]).fetchall()
+elif query:
+    res = conn.execute("select * from notes where notes match ? order by rank;", [query]).fetchall()
+else:
+    res = conn.execute("select * from notes order by mtime desc;").fetchall()
+
+conn.close()
+
+for r in res:
+    print(r[0])
