@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ -z "${ZK_PATH}" ]]; then
+    echo "ZK_PATH must be set"
+    return 1
+fi
+
+tmux new-session -s "zk" -c "${ZK_PATH}" "bash -l -c -i vim" \; split-window -h "zk_fzf_view"\;

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+fzf --ansi --height 100% \
+    --preview "bat --language md --style=plain --color always --line-range :100 {}" \
+    --preview-window=top:65% \
+    --bind "enter:execute-silent[ \
+        tmux send-keys -t \{left\} Escape :e Space && \
+        tmux send-keys -t \{left\} -l {} && \
+        tmux send-keys -t \{left\} Enter \
+    ]"
