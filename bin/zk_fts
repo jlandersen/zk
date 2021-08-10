@@ -3,6 +3,8 @@
 import os
 import sqlite3
 import argparse
+
+
 path = os.getenv('ZETTLE_HOME')
 zk_path = os.getenv('ZK_PATH')
 
@@ -18,6 +20,9 @@ conn.execute("insert into notes (notes, rank) values ('rank', 'bm25(4.0, 1.0, 6.
 
 for filename in os.listdir(path):
     with open(os.path.join(path, filename), 'r') as f:
+        if not filename.endswith(".md"):
+            continue
+
         file_stats = os.stat(os.path.join(path, filename))
         existing = conn.execute("select * from notes where file = ?", [filename]).fetchone()
 
@@ -38,15 +43,19 @@ query = args.query
 file = args.file
 
 if file and query:
-    res = conn.execute("select * from notes where file = ? and notes match ? order by rank;", [file, query]).fetchall()
+    res = conn.execute("select rank, file, content, tags from notes where file = ? and notes match ? order by rank;", [file, query]).fetchall()
 elif file:
-    res = conn.execute("select * from notes where file = ? order by mtime;", [file, query]).fetchall()
+    res = conn.execute("select rank, file, content, tags from notes where file = ? order by mtime;", [file, query]).fetchall()
 elif query:
-    res = conn.execute("select * from notes where notes match ? order by rank;", [query]).fetchall()
+    res = conn.execute("select rank, file, content, tags from notes where notes match ? order by rank;", [query]).fetchall()
+
+    if (res is None or len(res) == 0) and not query[-1] == "*":
+        res = conn.execute("select rank, file, content, tags from notes where notes match ? order by rank;", [f"{query}*"]).fetchall()
+
 else:
-    res = conn.execute("select * from notes order by mtime desc;").fetchall()
+    res = conn.execute("select rank, file, content, tags from notes order by mtime desc;").fetchall()
 
 conn.close()
 
 for r in res:
-    print(r[0])
+    print(r[1])
