@@ -2,12 +2,12 @@
 
 if [[ -z "${ZK_PATH}" ]]; then
     echo "ZK_PATH must be set"
-    return 1
+    exit 1
 fi
 
 if [[ -z "${ZETTLE_HOME}" ]]; then
     echo "ZETTLE_HOME must be set"
-    return 1
+    exit 1
 fi
 
-tmux new-session -s "zk" -c "${ZETTLE_HOME}" "bash -l -c -i vim" \; split-window -h "zk_fzf_view"\;
+tmux new-session -A -s "zk" -c "${ZETTLE_HOME}" "bash -l -c -i vim" \; split-window -h "zk_fzf_view"\;
