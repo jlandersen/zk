@@ -10,4 +10,4 @@ fzf --ansi --height 100% \
         tmux send-keys -t \{left\} -l {} && \
         tmux send-keys -t \{left\} Enter \
     ]" \
-    --query="${@}"
+    --query="$*"
