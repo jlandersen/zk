@@ -1,8 +1,12 @@
 # zk
-CLI for my zettelkasten setup 📚⌨️
+CLI for my zettelkasten setup 📚⌨️. Based on 
 
 ## Structure
-The structure is kept as simple as possible. All markdowns are stored in a single directory and meant to be searched rather than traversed in some hierarchy. All files are named and titled using the scheme `[year][month][day][hour][seconds]-[title]`. Example: `20201208080013-aws-summit-2020.md`.
+The structure is kept as simple as possible. All markdowns are stored in a single directory and meant to be searched rather than traversed in some hierarchy. All files are named and titled using the scheme `[year][month][day][hour][seconds] [title]`. Example: `20201208080013 AWS Summit 2020.md`. Everything is standard markdown with two conventions:
+
+* Last lines contains tags (`#aws`) - one tag per line
+* Links that references other markdowns are considered note links and will be indexed as such
+
 
 ## Requirements
 Everything assumes you have `fzf`, `bat` and `tmux`. On MacOS, install with homebrew:
