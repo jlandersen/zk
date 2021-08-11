@@ -6,14 +6,7 @@ import argparse
 
 
 path = os.getenv('ZETTLE_HOME')
-zk_path = os.getenv('ZK_PATH')
-
-if path is None:
-    path = "/Users/jeppe/Library/Mobile Documents/com~apple~CloudDocs/Files/Notes/zettles"
-
-if zk_path is None:
-    zk_path = "/Users/jeppe/zk/bin"
-
+zk_path = os.path.dirname(os.path.realpath(__file__))
 conn = sqlite3.connect(os.path.join(zk_path, 'index.db'))
 conn.execute("create virtual table if not exists notes using fts5(file, content, tags, mtime UNINDEXED, prefix = 3, tokenize = 'porter unicode61');")
 conn.execute("insert into notes (notes, rank) values ('rank', 'bm25(4.0, 1.0, 6.0, 0.0)');")

@@ -1,13 +1,16 @@
 #!/bin/bash
 
-if [[ -z "${ZK_PATH}" ]]; then
-    echo "ZK_PATH must be set"
-    exit 1
-fi
-
 if [[ -z "${ZETTLE_HOME}" ]]; then
     echo "ZETTLE_HOME must be set"
     exit 1
 fi
 
-tmux new-session -A -s "zk" -c "${ZETTLE_HOME}" "bash -l -c -i vim" \; split-window -h "zk_fzf_view"\;
+# Reattach explicitly if a zk session already exists instead of "new-session -A" to avoid further split windows
+# shellcheck disable=SC2143
+if [[ $(tmux list-sessions | grep 'zk') ]]; then
+    tmux attach-session -t "zk"
+else
+    tmux new-session -s "zk" -c "${ZETTLE_HOME}" "bash -l -c -i vim" \; split-window -h "zk_fzf_view"\;
+fi
+
+
