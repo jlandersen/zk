@@ -5,6 +5,56 @@ if [[ -z "${ZETTLE_HOME}" ]]; then
     exit 1
 fi
 
+function usage()
+{
+   cat << HEREDOC
+
+$(tput setaf 2)ZK$(tput sgr0)
+
+USAGE:
+    [CMD]
+
+
+COMMANDS:
+    (empty)           Opens a ZK notes session
+    new [title]       Creates a new note
+
+
+HEREDOC
+}
+
+HELP=false
+
+PARAMS=""
+
+while (( "$#" )); do
+  case "$1" in
+    -h)
+      HELP=true
+      shift
+      ;;
+    -*|--*=)
+      echo "Error: Unsupported flag $1" >&2
+      exit 1
+      ;;
+    *)
+      PARAMS="$PARAMS $1"
+      shift
+      ;;
+  esac
+done
+
+eval set -- "$PARAMS"
+
+# echo "$@"
+# echo "$PARAMS"
+# exit 0
+
+if [ "$HELP" = "true" ]; then
+  usage
+  exit 0
+fi
+
 # Reattach explicitly if a zk session already exists instead of "new-session -A" to avoid further split windows
 # shellcheck disable=SC2143
 if [[ $(tmux list-sessions | grep 'zk') ]]; then
